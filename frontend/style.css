@@ -417,4 +417,179 @@ body {
   .username {
     display: none;
   }
+
+  .modal-content {
+    margin: 10px;
+    max-height: 90vh;
+  }
+}
+
+.recreation-divider {
+  height: 1px;
+  background: rgba(167, 139, 250, 0.3);
+  margin: 16px 0;
+}
+
+.recreation-section {
+  margin-top: 4px;
+}
+
+.recreation-title {
+  font-size: 15px;
+  color: #c4b5fd;
+  margin-bottom: 14px;
+}
+
+.recreation-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  background: rgba(167, 139, 250, 0.15);
+  border-radius: 20px;
+  font-size: 12px;
+  color: #c4b5fd;
+}
+
+.dream-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.dream-detail-link {
+  font-size: 12px;
+  color: #a78bfa;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.dream-detail-link:hover {
+  color: #c4b5fd;
+}
+
+.dream-item {
+  cursor: pointer;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #1e1b4b 0%, #1a1a2e 50%, #16213e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 22px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  color: #e2e8f0;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.modal-close:hover {
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-body {
+  padding: 24px 28px;
+  overflow-y: auto;
+}
+
+.detail-dream-card {
+  background: rgba(167, 139, 250, 0.08);
+  border-radius: 12px;
+  padding: 18px;
+  border-left: 4px solid #a78bfa;
+  margin-bottom: 24px;
+}
+
+.detail-dream-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.detail-dream-content {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #e2e8f0;
+  font-style: italic;
+}
+
+.detail-section-title {
+  font-size: 16px;
+  color: #c4b5fd;
+  margin-bottom: 16px;
+}
+
+.recreation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.recreation-item {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.recreation-meta {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.recreation-field {
+  font-size: 14px;
+  color: #cbd5e1;
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+.recreation-label {
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+.recreation-summary {
+  font-style: italic;
+  color: #f0abfc;
 }

@@ -1,6 +1,6 @@
 const { createApp, ref, onMounted, computed } = Vue;
 
-const API_BASE = 'http://localhost:3001/api';
+const API_BASE = 'http://localhost:3103/api';
 
 createApp({
   setup() {
@@ -15,6 +15,13 @@ createApp({
     const dreams = ref([]);
     const randomDream = ref(null);
     const monthlyStats = ref({ count: 0, avgLucidity: 0 });
+
+    const recreationForm = ref({ direction: '', characterSetting: '', inspirationSummary: '' });
+    const recreationSaving = ref(false);
+
+    const showDreamDetail = ref(false);
+    const selectedDream = ref(null);
+    const detailRecreations = ref([]);
 
     const now = new Date();
     const selectedYear = ref(now.getFullYear());
@@ -188,6 +195,46 @@ createApp({
       }
     }
 
+    async function saveRecreation() {
+      if (!randomDream.value) return;
+      const { direction, characterSetting, inspirationSummary } = recreationForm.value;
+      if (!direction.trim() || !characterSetting.trim() || !inspirationSummary.trim()) {
+        alert('请填写完整的创作方向、角色设定和灵感摘要');
+        return;
+      }
+
+      recreationSaving.value = true;
+      try {
+        await apiRequest(`/dreams/${randomDream.value.id}/recreations`, {
+          method: 'POST',
+          body: JSON.stringify(recreationForm.value)
+        });
+        recreationForm.value = { direction: '', characterSetting: '', inspirationSummary: '' };
+        loadData();
+      } catch (e) {
+        alert(e.message);
+      } finally {
+        recreationSaving.value = false;
+      }
+    }
+
+    async function openDreamDetail(dream) {
+      selectedDream.value = dream;
+      showDreamDetail.value = true;
+      try {
+        const data = await apiRequest(`/dreams/${dream.id}/recreations`);
+        detailRecreations.value = data;
+      } catch (e) {
+        detailRecreations.value = [];
+      }
+    }
+
+    function closeDreamDetail() {
+      showDreamDetail.value = false;
+      selectedDream.value = null;
+      detailRecreations.value = [];
+    }
+
     function loadData() {
       fetchDreams();
       fetchMonthlyStats();
@@ -276,7 +323,15 @@ createApp({
       selectedYear,
       selectedMonth,
       yearOptions,
-      onMonthChange
+      onMonthChange,
+      recreationForm,
+      recreationSaving,
+      saveRecreation,
+      showDreamDetail,
+      selectedDream,
+      detailRecreations,
+      openDreamDetail,
+      closeDreamDetail
     };
   }
 }).mount('#app');

@@ -6,12 +6,13 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const PORT = 3001;
+const PORT = 3103;
 const JWT_SECRET = 'dream-secret-key-2024';
 
 const DATA_DIR = path.join(__dirname, 'data');
 const DREAMS_FILE = path.join(DATA_DIR, 'dreams.json');
 const USERS_FILE = path.join(DATA_DIR, 'users.json');
+const RECREATIONS_FILE = path.join(DATA_DIR, 'recreations.json');
 
 app.use(cors());
 app.use(express.json());
@@ -137,7 +138,16 @@ app.post('/api/login', (req, res) => {
 
 app.get('/api/dreams', authenticateToken, (req, res) => {
   const dreams = readJSON(DREAMS_FILE).filter(d => d.userId === req.user.id);
-  res.json(dreams.sort((a, b) => new Date(b.date) - new Date(a.date)));
+  const recreations = readJSON(RECREATIONS_FILE).filter(r => r.userId === req.user.id);
+  const countMap = {};
+  recreations.forEach(r => {
+    countMap[r.dreamId] = (countMap[r.dreamId] || 0) + 1;
+  });
+  const result = dreams.map(d => ({
+    ...d,
+    recreationCount: countMap[d.id] || 0
+  }));
+  res.json(result.sort((a, b) => new Date(b.date) - new Date(a.date)));
 });
 
 app.post('/api/dreams', authenticateToken, (req, res) => {
@@ -192,6 +202,44 @@ app.get('/api/stats/monthly', authenticateToken, (req, res) => {
     count,
     avgLucidity: parseFloat(avgLucidity)
   });
+});
+
+app.post('/api/dreams/:id/recreations', authenticateToken, (req, res) => {
+  const dreamId = parseInt(req.params.id);
+  const { direction, characterSetting, inspirationSummary } = req.body;
+
+  if (!direction || !characterSetting || !inspirationSummary) {
+    return res.status(400).json({ error: '创作方向、角色设定和灵感摘要必填' });
+  }
+
+  const dreams = readJSON(DREAMS_FILE);
+  const dream = dreams.find(d => d.id === dreamId && d.userId === req.user.id);
+  if (!dream) {
+    return res.status(404).json({ error: '梦境不存在' });
+  }
+
+  const recreations = readJSON(RECREATIONS_FILE);
+  const newRecreation = {
+    id: recreations.length > 0 ? Math.max(...recreations.map(r => r.id)) + 1 : 1,
+    dreamId,
+    userId: req.user.id,
+    direction,
+    characterSetting,
+    inspirationSummary,
+    createdAt: new Date().toISOString().split('T')[0]
+  };
+
+  recreations.push(newRecreation);
+  writeJSON(RECREATIONS_FILE, recreations);
+  res.status(201).json(newRecreation);
+});
+
+app.get('/api/dreams/:id/recreations', authenticateToken, (req, res) => {
+  const dreamId = parseInt(req.params.id);
+  const recreations = readJSON(RECREATIONS_FILE).filter(
+    r => r.dreamId === dreamId && r.userId === req.user.id
+  );
+  res.json(recreations.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
 });
 
 app.listen(PORT, () => {

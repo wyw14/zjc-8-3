@@ -78,6 +78,25 @@
               <div class="dream-lucidity">
                 清醒度: <span v-for="n in 5" :key="n" class="star">{{ n <= randomDream.lucidity ? '★' : '☆' }}</span>
               </div>
+              <div class="recreation-divider"></div>
+              <div class="recreation-section">
+                <h3 class="recreation-title">🎨 灵感再创作</h3>
+                <div class="form-group">
+                  <label>创作方向</label>
+                  <input v-model="recreationForm.direction" type="text" placeholder="如：科幻小说、短片剧本、插画...">
+                </div>
+                <div class="form-group">
+                  <label>角色设定</label>
+                  <input v-model="recreationForm.characterSetting" type="text" placeholder="为主角赋予新的身份与性格...">
+                </div>
+                <div class="form-group">
+                  <label>灵感摘要</label>
+                  <textarea v-model="recreationForm.inspirationSummary" rows="3" placeholder="用一句话改写这段梦境的灵感..."></textarea>
+                </div>
+                <button class="btn-primary" @click="saveRecreation" :disabled="recreationSaving">
+                  {{ recreationSaving ? '保存中...' : '💾 保存再创作' }}
+                </button>
+              </div>
             </div>
             <div v-else class="empty-dream">
               点击按钮抽取一条旧灵感
@@ -117,7 +136,7 @@
           <h2>📚 梦境列表</h2>
           <div v-if="dreams.length === 0" class="empty-dream">还没有记录梦境</div>
           <div v-else class="dream-list">
-            <div v-for="dream in dreams" :key="dream.id" class="dream-item">
+            <div v-for="dream in dreams" :key="dream.id" class="dream-item" @click="openDreamDetail(dream)">
               <div class="dream-header">
                 <span class="dream-date">{{ dream.date }}</span>
                 <span class="dream-lucidity">
@@ -125,10 +144,56 @@
                 </span>
               </div>
               <div class="dream-text">{{ dream.content }}</div>
+              <div class="dream-item-footer">
+                <span v-if="dream.recreationCount" class="recreation-badge">🎨 {{ dream.recreationCount }}条再创作</span>
+                <span class="dream-detail-link">查看详情 →</span>
+              </div>
             </div>
           </div>
         </div>
       </main>
+    </div>
+
+    <div v-if="showDreamDetail && selectedDream" class="modal-overlay" @click.self="closeDreamDetail">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>🌙 梦境详情</h2>
+          <button class="modal-close" @click="closeDreamDetail">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="detail-dream-card">
+            <div class="detail-dream-meta">
+              <span class="dream-date">{{ selectedDream.date }}</span>
+              <span class="dream-lucidity">
+                清醒度: <span v-for="n in 5" :key="n" class="star">{{ n <= selectedDream.lucidity ? '★' : '☆' }}</span>
+              </span>
+            </div>
+            <div class="detail-dream-content">"{{ selectedDream.content }}"</div>
+          </div>
+
+          <div class="detail-recreations">
+            <h3 class="detail-section-title">🎨 再创作记录</h3>
+            <div v-if="detailRecreations.length === 0" class="empty-dream">暂无再创作记录</div>
+            <div v-else class="recreation-list">
+              <div v-for="rec in detailRecreations" :key="rec.id" class="recreation-item">
+                <div class="recreation-meta">{{ rec.createdAt }}</div>
+                <div class="recreation-field">
+                  <span class="recreation-label">创作方向：</span>
+                  <span>{{ rec.direction }}</span>
+                </div>
+                <div class="recreation-field">
+                  <span class="recreation-label">角色设定：</span>
+                  <span>{{ rec.characterSetting }}</span>
+                </div>
+                <div class="recreation-field">
+                  <span class="recreation-label">灵感摘要：</span>
+                  <span class="recreation-summary">"{{ rec.inspirationSummary }}"</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
